@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">CV_Builder</string>
+    <string name="cv_builder">CV Builder</string>
+    <string name="profile_picture">Profile Picture</string>
+    <string name="personal_details">Personal Details</string>
+    <string name="summary">Summary</string>
+    <string name="education">Education</string>
+    <string name="experience">Experience</string>
+    <string name="certifications">Certifications</string>
+    <string name="references">References</string>
+    <string name="save">Save</string>
+    <string name="sharecv">Share CV</string>
+    <string name="cancel">Cancel</string>
+    <string name="enter_certificates">Enter your certificates</string>
+    <string name="enter_education_details">Enter your education details</string>
+    <string name="enter_experience">Enter your work experience</string>
+    <string name="select_image">Select Image</string>
 </resources>

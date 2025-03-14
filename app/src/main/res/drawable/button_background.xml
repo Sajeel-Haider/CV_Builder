@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <!-- Use a dynamic color from your colors.xml -->
+    <solid android:color="@color/background_color_secondary" />
+    <!-- Increase the border radius -->
+    <corners android:radius="50dp" />
+</shape>
