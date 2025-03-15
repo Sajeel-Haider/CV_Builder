@@ -12,7 +12,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
-    private Button btnProfilePicture, btnPersonalDetails, btnSummary, btnEducation, btnExperience, btnCertifications, btnReferences;
+    private Button btnProfilePicture, btnPersonalDetails, btnSummary, btnNext,btnEducation, btnExperience, btnCertifications, btnReferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
         btnExperience = findViewById(R.id.btnExperience);
         btnCertifications = findViewById(R.id.btnCertifications);
         btnReferences = findViewById(R.id.btnReferences);
+        btnNext = findViewById(R.id.btnNext);
 
         // Set click listeners for each button
 
@@ -93,6 +94,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, ReferencesActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
+        btnNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, FinalActivity.class);
                 startActivity(intent);
             }
         });

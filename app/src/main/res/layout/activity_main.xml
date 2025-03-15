@@ -93,5 +93,14 @@
             android:text="@string/references"
             android:textColor="@android:color/white" />
 
+        <Button
+            android:id="@+id/btnNext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="44dp"
+            android:backgroundTint="@color/background_color_secondary"
+            android:text="Next"
+            android:textColor="@android:color/white" />
+
     </LinearLayout>
 </ScrollView>

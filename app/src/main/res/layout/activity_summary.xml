@@ -19,16 +19,17 @@
             android:hint="Enter your summary"
             android:textColor="@android:color/white"
             android:background="#444444"
-            android:minLines="5"
+            android:minLines="10"
             android:gravity="top" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnSave"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Save"
+            android:text="@string/save"
+            android:textAllCaps="false"
             android:textColor="@android:color/white"
-            android:background="#444444"
+            android:background="@color/background_color_secondary"
             android:layout_marginTop="16dp" />
 
         <Button
