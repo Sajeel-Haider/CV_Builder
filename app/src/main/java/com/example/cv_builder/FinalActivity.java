@@ -1,14 +1,22 @@
 package com.example.cv_builder;
 
 import android.content.Intent;
+import android.graphics.Canvas;
+import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class FinalActivity extends AppCompatActivity {
 
@@ -24,11 +32,17 @@ public class FinalActivity extends AppCompatActivity {
     private TextView tvReferencesTitle, tvReferencesContent;
 
     private Button btnShare;
+    // The root layout which contains the CV content.
+    // Make sure to set this ID in your activity_final.xml.
+    private View finalRootLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_final);
+
+        // Bind the root layout
+        finalRootLayout = findViewById(R.id.finalRootLayout);
 
         // Bind profile section views
         ivProfilePicture = findViewById(R.id.ivProfilePicture);
@@ -92,20 +106,65 @@ public class FinalActivity extends AppCompatActivity {
         tvReferencesTitle.setText("References");
         tvReferencesContent.setText(getSafeString(CVData.references, "No references provided"));
 
-        // Setup share button to share a formatted CV text
+        // Setup share button to create and share a PDF of the CV
         btnShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String cvText = buildCVText();
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.setType("text/plain");
-                shareIntent.putExtra(Intent.EXTRA_SUBJECT, "My CV");
-                shareIntent.putExtra(Intent.EXTRA_TEXT, cvText);
-                startActivity(Intent.createChooser(shareIntent, "Share CV via"));
+                createPdfAndShare();
             }
         });
     }
 
+    private String getSafeString(String input, String defaultValue) {
+        if (input == null || input.isEmpty()) {
+            return defaultValue;
+        }
+        return input;
+    }
+
+    // Create a PDF from the view and share it
+    private void createPdfAndShare() {
+        // Get the dimensions of the view to create a PdfDocument page
+        int width = finalRootLayout.getWidth();
+        int height = finalRootLayout.getHeight();
+
+        PdfDocument pdfDocument = new PdfDocument();
+        PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(width, height, 1).create();
+        PdfDocument.Page page = pdfDocument.startPage(pageInfo);
+
+        // Draw the view onto the PDF page's canvas
+        Canvas canvas = page.getCanvas();
+        finalRootLayout.draw(canvas);
+
+        pdfDocument.finishPage(page);
+
+        // Save the PDF to a file in external cache directory
+        File pdfFile = new File(getExternalCacheDir(), "my_cv.pdf");
+        try {
+            FileOutputStream fos = new FileOutputStream(pdfFile);
+            pdfDocument.writeTo(fos);
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        pdfDocument.close();
+
+        // Get URI for the file using FileProvider
+        Uri uri = FileProvider.getUriForFile(
+                this,
+                "com.example.cv_builder.fileprovider", // ensure this matches your manifest
+                pdfFile
+        );
+
+        // Create share intent
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("application/pdf");
+        shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivity(Intent.createChooser(shareIntent, "Share CV PDF via"));
+    }
+
+    // Build CV text (no longer used for sharing, but kept if needed)
     private String buildCVText() {
         StringBuilder sb = new StringBuilder();
         sb.append("Name: ").append(getSafeString(CVData.userName, "Name not provided")).append("\n")
@@ -117,13 +176,5 @@ public class FinalActivity extends AppCompatActivity {
                 .append("Certifications:\n").append(getSafeString(CVData.certifications, "No certifications provided")).append("\n\n")
                 .append("References:\n").append(getSafeString(CVData.references, "No references provided")).append("\n\n");
         return sb.toString();
-    }
-
-    // Utility method to safely retrieve a string or a default value if it's null or empty
-    private String getSafeString(String input, String defaultValue) {
-        if (input == null || input.isEmpty()) {
-            return defaultValue;
-        }
-        return input;
     }
 }

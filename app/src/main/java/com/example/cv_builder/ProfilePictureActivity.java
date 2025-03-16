@@ -1,5 +1,6 @@
 package com.example.cv_builder;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
@@ -27,6 +28,7 @@ public class ProfilePictureActivity extends AppCompatActivity {
     private ImageView imageView;
     private Button btnSelect, btnSave, btnCancel;
     private Uri selectedImageUri = null;
+    private ProgressDialog progressDialog; // Loader dialog
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,17 +65,38 @@ public class ProfilePictureActivity extends AppCompatActivity {
             @Override
             public void onClick(View view){
                 if (selectedImageUri != null) {
-                    try {
-                        // Convert URI to Bitmap
-                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImageUri);
-                        // Save Bitmap to internal storage and store its file path in CVData
-                        String imagePath = saveToInternalStorage(bitmap);
-                        CVData.profilePicturePath = imagePath;
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    // Show loader
+                    progressDialog = ProgressDialog.show(ProfilePictureActivity.this,
+                            "Uploading Image", "Please wait...", true);
+
+                    // Process image conversion and saving on a background thread
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                // Convert URI to Bitmap
+                                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImageUri);
+                                // Save Bitmap to internal storage and get its file path
+                                String imagePath = saveToInternalStorage(bitmap);
+                                CVData.profilePicturePath = imagePath;
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            // Dismiss loader and finish activity on the UI thread
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (progressDialog != null && progressDialog.isShowing()) {
+                                        progressDialog.dismiss();
+                                    }
+                                    finish();
+                                }
+                            });
+                        }
+                    }).start();
+                } else {
+                    finish();
                 }
-                finish(); // Return to previous screen with saved data
             }
         });
 
