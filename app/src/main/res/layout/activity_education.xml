@@ -12,29 +12,55 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- Institution Name Input -->
         <EditText
-            android:id="@+id/etEducation"
+            android:id="@+id/etInstitution"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/enter_education_details"
+            android:hint="Enter Institution Name"
             android:textColor="@android:color/white"
-            android:background="@color/dark_gray"
-            android:minLines="3" />
+            android:background="@color/background_color_secondary"
+            android:padding="8dp" />
 
+        <!-- Degree/Qualification Input -->
+        <EditText
+            android:id="@+id/etDegree"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter Degree/Qualification"
+            android:textColor="@android:color/white"
+            android:background="@color/background_color_secondary"
+            android:padding="8dp"
+            android:layout_marginTop="8dp" />
+
+        <!-- Additional Education Details Input -->
+        <EditText
+            android:id="@+id/etEducationDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter additional details (e.g., duration, major)"
+            android:textColor="@android:color/white"
+            android:background="@color/background_color_secondary"
+            android:minLines="3"
+            android:padding="8dp"
+            android:layout_marginTop="8dp" />
+
+        <!-- Save Button -->
         <Button
             android:id="@+id/btnSave"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/save"
+            android:text="Save"
             android:textColor="@android:color/white"
             android:background="@color/dark_gray"
             android:layout_marginTop="16dp" />
 
+        <!-- Cancel Button -->
         <Button
             android:id="@+id/btnCancel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/cancel"
+            android:text="Cancel"
             android:textColor="@android:color/white"
             android:background="@color/dark_gray"
             android:layout_marginTop="8dp" />

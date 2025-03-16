@@ -27,6 +27,7 @@ public class SummaryActivity extends AppCompatActivity {
         });
 
         init();
+        loadSavedData();
     }
 
     void init(){
@@ -37,6 +38,7 @@ public class SummaryActivity extends AppCompatActivity {
         btnSave.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
+                // Save the entered summary to CVData
                 CVData.summary = etSummary.getText().toString();
                 finish();
             }
@@ -45,8 +47,17 @@ public class SummaryActivity extends AppCompatActivity {
         btnCancel.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
+                // Discard any changes by clearing the saved summary data
+                CVData.summary = "";
                 finish();
             }
         });
+    }
+
+    // Load previously saved summary into the EditText
+    void loadSavedData() {
+        if (CVData.summary != null && !CVData.summary.isEmpty()) {
+            etSummary.setText(CVData.summary);
+        }
     }
 }

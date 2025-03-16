@@ -1,11 +1,19 @@
 package com.example.cv_builder;
 
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
@@ -32,9 +40,10 @@ public class ProfilePictureActivity extends AppCompatActivity {
         });
 
         init();
+        loadSavedData();
     }
 
-    void init(){
+    void init() {
         imageView = findViewById(R.id.imageView);
         btnSelect = findViewById(R.id.btnSelectImage);
         btnSave = findViewById(R.id.btnSave);
@@ -53,21 +62,42 @@ public class ProfilePictureActivity extends AppCompatActivity {
         btnSave.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                // Save selected image URI to CVData
                 if (selectedImageUri != null) {
-                    CVData.profilePictureUri = selectedImageUri.toString();
+                    try {
+                        // Convert URI to Bitmap
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImageUri);
+                        // Save Bitmap to internal storage and store its file path in CVData
+                        String imagePath = saveToInternalStorage(bitmap);
+                        CVData.profilePicturePath = imagePath;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-                finish(); // Return to Home Screen
+                finish(); // Return to previous screen with saved data
             }
         });
 
         btnCancel.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                finish(); // Discard changes and go back
+                // Discard any changes by clearing the saved profile picture data.
+                CVData.profilePicturePath = "";
+                finish(); // Return to previous screen
             }
         });
     }
+
+    // Load the previously saved profile picture from internal storage using CVData.profilePicturePath
+    void loadSavedData() {
+        if (CVData.profilePicturePath != null && !CVData.profilePicturePath.isEmpty()) {
+            File imgFile = new File(CVData.profilePicturePath);
+            if (imgFile.exists()) {
+                Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                imageView.setImageBitmap(bitmap);
+            }
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data){
         super.onActivityResult(requestCode, resultCode, data);
@@ -75,5 +105,31 @@ public class ProfilePictureActivity extends AppCompatActivity {
             selectedImageUri = data.getData();
             imageView.setImageURI(selectedImageUri);
         }
+    }
+
+    // Save a Bitmap image to internal storage and return its file path.
+    private String saveToInternalStorage(Bitmap bitmapImage) {
+        ContextWrapper cw = new ContextWrapper(getApplicationContext());
+        // Directory: /data/data/your_app/app_data/imageDir
+        File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
+        // Create a file (profile.jpg) within that directory
+        File mypath = new File(directory, "profile.jpg");
+
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(mypath);
+            // Compress the bitmap and write it to the output stream
+            bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (fos != null)
+                    fos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return mypath.getAbsolutePath();
     }
 }

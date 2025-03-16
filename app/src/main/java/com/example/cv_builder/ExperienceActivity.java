@@ -27,26 +27,36 @@ public class ExperienceActivity extends AppCompatActivity {
         });
 
         init();
+        loadSavedData();
     }
 
-    void init(){
+    void init() {
         etExperience = findViewById(R.id.etExperience);
         btnSave = findViewById(R.id.btnSave);
         btnCancel = findViewById(R.id.btnCancel);
 
-        btnSave.setOnClickListener(new View.OnClickListener(){
+        btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view){
+            public void onClick(View view) {
                 CVData.experience = etExperience.getText().toString();
                 finish();
             }
         });
 
-        btnCancel.setOnClickListener(new View.OnClickListener(){
+        btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view){
+            public void onClick(View view) {
+                // Discard changes by clearing the saved experience data
+                CVData.experience = "";
                 finish();
             }
         });
+    }
+
+    // Load previously saved experience data into the EditText
+    void loadSavedData() {
+        if (CVData.experience != null && !CVData.experience.isEmpty()) {
+            etExperience.setText(CVData.experience);
+        }
     }
 }

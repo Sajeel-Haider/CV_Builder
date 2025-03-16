@@ -26,6 +26,7 @@ public class CertificationsActivity extends AppCompatActivity {
             return insets;
         });
         init();
+        loadSavedData();
     }
 
     void init(){
@@ -44,8 +45,17 @@ public class CertificationsActivity extends AppCompatActivity {
         btnCancel.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
+                // Discard changes by clearing saved certifications data
+                CVData.certifications = "";
                 finish();
             }
         });
+    }
+
+    // Load previously saved certifications data into the EditText
+    void loadSavedData() {
+        if (CVData.certifications != null && !CVData.certifications.isEmpty()) {
+            etCertifications.setText(CVData.certifications);
+        }
     }
 }

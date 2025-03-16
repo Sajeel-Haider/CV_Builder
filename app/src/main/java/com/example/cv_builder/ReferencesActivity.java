@@ -27,6 +27,7 @@ public class ReferencesActivity extends AppCompatActivity {
         });
 
         init();
+        loadSavedData();
     }
 
     void init(){
@@ -45,8 +46,17 @@ public class ReferencesActivity extends AppCompatActivity {
         btnCancel.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
+                // Discard changes by clearing saved references data
+                CVData.references = "";
                 finish();
             }
         });
+    }
+
+    // Load previously saved reference data into the EditText
+    void loadSavedData() {
+        if (CVData.references != null && !CVData.references.isEmpty()) {
+            etReferences.setText(CVData.references);
+        }
     }
 }

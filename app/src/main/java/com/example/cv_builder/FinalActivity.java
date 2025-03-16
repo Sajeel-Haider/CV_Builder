@@ -12,9 +12,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class FinalActivity extends AppCompatActivity {
 
+    // Profile Section Views
     private ImageView ivProfilePicture;
     private TextView tvName, tvEmail, tvPhone;
-    // For each included layout:
+
+    // Included card Views (retrieved from include layouts)
     private TextView tvSummaryTitle, tvSummaryContent;
     private TextView tvEducationTitle, tvEducationContent;
     private TextView tvExperienceTitle, tvExperienceContent;
@@ -28,76 +30,69 @@ public class FinalActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_final);
 
-        // Profile Section
+        // Bind profile section views
         ivProfilePicture = findViewById(R.id.ivProfilePicture);
         tvName = findViewById(R.id.tvName);
         tvEmail = findViewById(R.id.tvEmail);
         tvPhone = findViewById(R.id.tvPhone);
 
-        // Summary Section
-        View summaryView = findViewById(R.id.includeSummary);
-        tvSummaryTitle = summaryView.findViewById(R.id.tvSectionTitle);
-        tvSummaryContent = summaryView.findViewById(R.id.tvSectionContent);
+        // Bind the include layouts and retrieve their inner TextViews
+        View summaryInclude = findViewById(R.id.includeSummary);
+        tvSummaryTitle = summaryInclude.findViewById(R.id.tvSectionTitle);
+        tvSummaryContent = summaryInclude.findViewById(R.id.tvSectionContent);
 
-        // Education Section
-        View educationView = findViewById(R.id.includeEducation);
-        tvEducationTitle = educationView.findViewById(R.id.tvSectionTitle);
-        tvEducationContent = educationView.findViewById(R.id.tvSectionContent);
+        View educationInclude = findViewById(R.id.includeEducation);
+        tvEducationTitle = educationInclude.findViewById(R.id.tvSectionTitle);
+        tvEducationContent = educationInclude.findViewById(R.id.tvSectionContent);
 
-        // Experience Section
-        View experienceView = findViewById(R.id.includeExperience);
-        tvExperienceTitle = experienceView.findViewById(R.id.tvSectionTitle);
-        tvExperienceContent = experienceView.findViewById(R.id.tvSectionContent);
+        View experienceInclude = findViewById(R.id.includeExperience);
+        tvExperienceTitle = experienceInclude.findViewById(R.id.tvSectionTitle);
+        tvExperienceContent = experienceInclude.findViewById(R.id.tvSectionContent);
 
-        // Certifications Section
-        View certsView = findViewById(R.id.includeCertifications);
-        tvCertificationsTitle = certsView.findViewById(R.id.tvSectionTitle);
-        tvCertificationsContent = certsView.findViewById(R.id.tvSectionContent);
+        View certificationsInclude = findViewById(R.id.includeCertifications);
+        tvCertificationsTitle = certificationsInclude.findViewById(R.id.tvSectionTitle);
+        tvCertificationsContent = certificationsInclude.findViewById(R.id.tvSectionContent);
 
-        // References Section
-        View refsView = findViewById(R.id.includeReferences);
-        tvReferencesTitle = refsView.findViewById(R.id.tvSectionTitle);
-        tvReferencesContent = refsView.findViewById(R.id.tvSectionContent);
+        View referencesInclude = findViewById(R.id.includeReferences);
+        tvReferencesTitle = referencesInclude.findViewById(R.id.tvSectionTitle);
+        tvReferencesContent = referencesInclude.findViewById(R.id.tvSectionContent);
 
-        // Share Button
         btnShare = findViewById(R.id.btnShare);
 
-        // Load data from CVData (or wherever you store user input)
         populateUI();
     }
 
     private void populateUI() {
-        // Profile Picture
-        if (CVData.profilePictureUri != null && !CVData.profilePictureUri.isEmpty()) {
-            ivProfilePicture.setImageURI(Uri.parse(CVData.profilePictureUri));
+        // Set profile picture if provided
+        if (CVData.profilePicturePath != null && !CVData.profilePicturePath.isEmpty()) {
+            ivProfilePicture.setImageURI(Uri.parse(CVData.profilePicturePath));
+        } else {
+            // Optionally set a default image if desired:
+            // ivProfilePicture.setImageResource(R.drawable.default_profile);
         }
 
-        // Name, Email, Phone
-        tvName.setText(CVData.userName);
-        tvEmail.setText(CVData.userEmail);
-        tvPhone.setText(CVData.userPhone);
+        // Set profile information with default text if empty or null
+        tvName.setText(getSafeString(CVData.userName, "Name not provided"));
+        tvEmail.setText(getSafeString(CVData.userEmail, "Email not provided"));
+        tvPhone.setText(getSafeString(CVData.userPhone, "Phone not provided"));
 
-        // SUMMARY
+        // Set the headings and content for each section using CVData
         tvSummaryTitle.setText("Summary");
-        tvSummaryContent.setText(CVData.summary);
+        tvSummaryContent.setText(getSafeString(CVData.summary, "No summary provided"));
 
-        // EDUCATION
         tvEducationTitle.setText("Education");
-        tvEducationContent.setText(CVData.education);
+        tvEducationContent.setText(getSafeString(CVData.education, "No education details provided"));
 
-        // EXPERIENCE
-        tvExperienceTitle.setText("Work Experience");
-        tvExperienceContent.setText(CVData.experience);
+        tvExperienceTitle.setText("Experience");
+        tvExperienceContent.setText(getSafeString(CVData.experience, "No experience details provided"));
 
-        // CERTIFICATIONS
         tvCertificationsTitle.setText("Certifications");
-        tvCertificationsContent.setText(CVData.certifications);
+        tvCertificationsContent.setText(getSafeString(CVData.certifications, "No certifications provided"));
 
-        // REFERENCES
         tvReferencesTitle.setText("References");
-        tvReferencesContent.setText(CVData.references);
+        tvReferencesContent.setText(getSafeString(CVData.references, "No references provided"));
 
-        // Setup share button
+        // Setup share button to share a formatted CV text
         btnShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -113,14 +108,22 @@ public class FinalActivity extends AppCompatActivity {
 
     private String buildCVText() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Name: ").append(CVData.userName).append("\n")
-                .append("Email: ").append(CVData.userEmail).append("\n")
-                .append("Phone: ").append(CVData.userPhone).append("\n\n")
-                .append("Summary:\n").append(CVData.summary).append("\n\n")
-                .append("Education:\n").append(CVData.education).append("\n\n")
-                .append("Experience:\n").append(CVData.experience).append("\n\n")
-                .append("Certifications:\n").append(CVData.certifications).append("\n\n")
-                .append("References:\n").append(CVData.references).append("\n\n");
+        sb.append("Name: ").append(getSafeString(CVData.userName, "Name not provided")).append("\n")
+                .append("Email: ").append(getSafeString(CVData.userEmail, "Email not provided")).append("\n")
+                .append("Phone: ").append(getSafeString(CVData.userPhone, "Phone not provided")).append("\n\n")
+                .append("Summary:\n").append(getSafeString(CVData.summary, "No summary provided")).append("\n\n")
+                .append("Education:\n").append(getSafeString(CVData.education, "No education details provided")).append("\n\n")
+                .append("Experience:\n").append(getSafeString(CVData.experience, "No experience details provided")).append("\n\n")
+                .append("Certifications:\n").append(getSafeString(CVData.certifications, "No certifications provided")).append("\n\n")
+                .append("References:\n").append(getSafeString(CVData.references, "No references provided")).append("\n\n");
         return sb.toString();
+    }
+
+    // Utility method to safely retrieve a string or a default value if it's null or empty
+    private String getSafeString(String input, String defaultValue) {
+        if (input == null || input.isEmpty()) {
+            return defaultValue;
+        }
+        return input;
     }
 }

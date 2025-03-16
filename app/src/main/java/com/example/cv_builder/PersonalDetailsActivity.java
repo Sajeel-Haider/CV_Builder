@@ -27,30 +27,93 @@ public class PersonalDetailsActivity extends AppCompatActivity {
         });
 
         init();
+        loadSavedData();
     }
 
-    void init(){
+    void init() {
         etName = findViewById(R.id.etName);
         etEmail = findViewById(R.id.etEmail);
         etPhone = findViewById(R.id.etPhone);
         btnSave = findViewById(R.id.btnSave);
         btnCancel = findViewById(R.id.btnCancel);
 
-        btnSave.setOnClickListener(new View.OnClickListener(){
+        btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view){
-                CVData.personalDetails = "Name: " + etName.getText().toString() +
-                        "\nEmail: " + etEmail.getText().toString() +
-                        "\nPhone: " + etPhone.getText().toString();
+            public void onClick(View view) {
+                // Trim input values
+                String name = etName.getText().toString().trim();
+                String email = etEmail.getText().toString().trim();
+                String phone = etPhone.getText().toString().trim();
+
+                // Validate Name
+                if (name.length() < 2) {
+                    etName.setError("Name must be at least 2 characters");
+                    return;
+                }
+
+                // Validate Email: must contain '@' and end with '.com'
+                if (!isValidEmail(email)) {
+                    etEmail.setError("Invalid email address");
+                    return;
+                }
+
+                // Validate Phone: at least 7 digits, only digits (ignoring a possible '+' at start)
+                if (!isValidPhone(phone)) {
+                    etPhone.setError("Invalid phone number");
+                    return;
+                }
+
+                // Save the entered personal details to CVData if validations pass
+                CVData.userName = name;
+                CVData.userEmail = email;
+                CVData.userPhone = phone;
+                CVData.personalDetails = "Name: " + name +
+                        "\nEmail: " + email +
+                        "\nPhone: " + phone;
                 finish();
             }
         });
 
-        btnCancel.setOnClickListener(new View.OnClickListener(){
+        btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view){
+            public void onClick(View view) {
+                // Discard any changes by clearing the saved personal details data
+                CVData.userName = "";
+                CVData.userEmail = "";
+                CVData.userPhone = "";
+                CVData.personalDetails = "";
                 finish();
             }
         });
+    }
+
+    // Load previously saved personal details into the EditTexts
+    void loadSavedData() {
+        if (CVData.userName != null && !CVData.userName.isEmpty()) {
+            etName.setText(CVData.userName);
+        }
+        if (CVData.userEmail != null && !CVData.userEmail.isEmpty()) {
+            etEmail.setText(CVData.userEmail);
+        }
+        if (CVData.userPhone != null && !CVData.userPhone.isEmpty()) {
+            etPhone.setText(CVData.userPhone);
+        }
+    }
+
+    // Email validation: must contain '@' and end with ".com"
+    private boolean isValidEmail(String email) {
+        return email.contains("@") && email.endsWith(".com");
+    }
+
+    // Phone validation: can start with '+'; must have at least 7 digits and only digits otherwise
+    private boolean isValidPhone(String phone) {
+        if (phone.isEmpty()) {
+            return false;
+        }
+        String phoneWithoutPlus = phone.startsWith("+") ? phone.substring(1) : phone;
+        if (phoneWithoutPlus.length() < 7) {
+            return false;
+        }
+        return phoneWithoutPlus.matches("\\d+");
     }
 }

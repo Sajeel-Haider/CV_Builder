@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:hint="Enter your references"
             android:textColor="@android:color/white"
-            android:background="@color/dark_gray"
+            android:background="@color/background_color_secondary"
             android:minLines="3" />
 
         <Button
